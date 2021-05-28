@@ -1,8 +1,12 @@
+import json
 import unittest
-from random import randrange
+from random import choice, randrange
 import fetcher
 import checkip
 from fetcher import IPStorage
+
+from app import app 
+app.testing = True
 
 class TestSuite(unittest.TestCase):
   def test_correct_ip(self):
@@ -21,6 +25,28 @@ class TestSuite(unittest.TestCase):
     store.ips = fake_value
     store.refresh()
     self.assertNotEqual(store.ips, fake_value)
+  
+  def test_invalid_ips(self):
+    msg = {'status': 400, 'reason': 'invalid ips given'}
+    with app.test_client() as client:
+      sent = {"ips": ['bad.ip', 'fake']}
+      result = client.post(
+        '/checkips',
+        json = sent
+      )
+      self.assertEqual(json.loads(result.data), msg)
+  
+  def test_valid_ips(self):
+    store = IPStorage()
+    ips = [choice(tuple(store.ips)) for i in range(2)]
+    with app.test_client() as client:
+      sent = {"ips": ips}
+      result = client.post(
+        '/checkips',
+        json = sent
+      )
+      self.assertEqual(json.loads(result.data), 2)
+
 
 if __name__ == "__main__":
   unittest.main()

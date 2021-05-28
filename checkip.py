@@ -1,6 +1,8 @@
 ## checks validity of input ip_addr
 def check(ip_addr):
   parts = ip_addr.split('.')
+  if len(parts) != 4:
+    return False
   for part in parts:
     try:
       i = int(part)
