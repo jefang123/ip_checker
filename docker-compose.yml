@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  ip-checker:
+    build: ./
+    volumes:
+      - ./:/user/src/backend
+    ports:
+      - 5000:5000
